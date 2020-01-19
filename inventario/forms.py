@@ -1,0 +1,90 @@
+from django import forms
+
+#Creando el formulario.
+from .models import Categoria, SubCategoria, Marca, UnidadMedida, Producto
+
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = Categoria
+        fields = ['descripcion','estado']
+        labels = {'descripcion':"Descripcion de Categoría",
+               "estado":"Estado"}
+        widget={'descripcion': forms.TextInput}
+
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class':'form-control'
+            })
+        
+        
+
+class SubCategoriaForm(forms.ModelForm):
+    categoria = forms.ModelChoiceField(
+        queryset=Categoria.objects.filter(estado=True)
+        .order_by('descripcion')
+    )    
+    class Meta:
+        model=SubCategoria
+        fields = ['categoria','descripcion','estado']
+        labels = {'descripcion':"Descripción de la Sub Categoría",
+               "estado":"Estado"}
+        widget={'descripcion': forms.TextInput}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class':'form-control'
+            })
+        
+        self.fields['categoria'].empty_label= "Seleccione Categoria"
+
+class MarcaForm(forms.ModelForm):
+    class Meta:
+        model = Marca
+        fields = ['descripcion','estado']
+        labels = {'descripcion':"Descripcion de Marca",
+               "estado":"Estado"}
+        widget={'descripcion': forms.TextInput}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class':'form-control'
+            })
+
+class UnidadMForm(forms.ModelForm):
+    class Meta:
+        model = UnidadMedida
+        fields = ['descripcion','estado']
+        labels = {'descripcion':"Descripcion de Marca",
+               "estado":"Estado"}
+        widget={'descripcion': forms.TextInput}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class':'form-control'
+            })
+
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model=Producto
+        fields=['codigo','codigo_barra','descripcion','estado', 
+                'precio', 'existencia','ultima_compra',
+                'marca','subcategoria','unidadmedida']
+        exclude=['usuario_modif','fecha_modificado','usuario_crea','fecha_creacion']
+        widget={'descripcion':forms.TextInput()}
+
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+        self.fields['ultima_compra'].widget.attrs['readonly'] = True
+        self.fields['existencia'].widget.attrs['readonly'] = True
