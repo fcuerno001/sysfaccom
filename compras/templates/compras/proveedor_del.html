@@ -1,0 +1,72 @@
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<form method="POST" class="form-inline">
+{% csrf_token %}
+       <div class="col">
+              <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="alert">
+                      ¿Inactivar <b> {{ obj.descripcion }} </b>?
+                      </div>
+                    </div>
+                  </div>
+                  <div>  
+                      <button type="button" class="btn btn-danger" id="btnInactivar"><i class="far fa-question-circle"></i>Si, Inactivar</button>
+                      <button type="button" class="btn btn-success" onclick="return cerrar_modal()">
+                        No, Cancelar
+                    </button>
+                  </div> 
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </form>
+  </div>
+</div>
+
+<script>
+$(document).ready(function(){
+
+  var token = $('input[name=csrfmiddlewaretoken]').val();
+  $.ajaxSetup({
+        beforeSend: function(xhr, settings){
+            if(!(/^http:.*/.test(settings.url) || /^http:.*/.test(settings.url))){
+               xhr.setRequestHeader("X-CSRFToken", token);
+              }
+            } 
+        });    
+
+$("#btnInactivar").click(function(e){
+    e.preventDefault();
+    window.location.reload();//Recarga la pagina
+    //alert("Probando");
+    
+    var id = {{ obj.id }};
+    var template = "{% url 'compras:proveedor_inactivar' obj.id %}";
+    var data = {"id":id};
+    data = JSON.stringify(data);
+
+    $.ajax({
+      type:"POST",
+      url: template,
+      data: data,
+      beforeSend: function(xhr, settings){
+        $.ajaxSettings.beforeSend(xhr,settings);
+      }, //beforesend
+        success: function(response){
+          console.log(response);
+          cerrar_modal();
+          alert(response);
+      }, //success
+        error: function(jqXHR, textStatus, erroThrow){
+          console.log(textStatus, erroThrow);
+          cerrar_modal();
+        }//error
+      }); //ajax
+  }); //inactivar
+}); 
+</script>
